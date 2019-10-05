@@ -7,5 +7,8 @@
 - cargo bootimage
 - qemu-system-x86_64 -drive format=raw,file=target/x86_64/debug/bootimage-os.bin (to run it in a virtualized env)
 *the bootimage can be found at ./target/x86_64/debug/bootimage-os.bin (from project root)*
+OR
+
+- cargo xrun
 
 ## *run all of this at the project root*
