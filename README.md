@@ -1,7 +1,8 @@
 # To build the program
-cargo rustc -- -C link-arg=-nostartfiles
+- cargo install cargo-xbuild (just once to install the crate)
+- cargo xbuild
 
 # to run the program 
 ./target/debug/os
 
-- run all of this at the project root
+## *run all of this at the project root*
