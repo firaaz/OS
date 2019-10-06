@@ -11,10 +11,21 @@ use core::panic::PanicInfo;
 mod vga_buffer;
 mod serial;
 
-// Function called on panic
+// removed as prints on the console
+/* #[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
+    loop{}
+} */
+
+// Function called on panic
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    serial_println!("[failed]\n");
+    serial_println!("Error: {}", info);
+    exit_qemu(QemuExitCode::Failed);
     loop{}
 }
 
@@ -34,7 +45,7 @@ pub extern "C" fn _start() {
 
 #[cfg(test)]
 fn test_runner(tests: &[&dyn Fn()]) {
-    println!("Running {} tests", tests.len());
+    serial_println!("Running {} tests", tests.len());
     for test in tests {
         test();
     }
@@ -43,9 +54,9 @@ fn test_runner(tests: &[&dyn Fn()]) {
 
 #[test_case]
 fn trivial_assertion() {
-    println!("trivial assertion ");
+    serial_print!("trivial assertion........");
     assert_eq!(1, 1);
-    println!("[ok]");
+    serial_println!("[ok]");
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
