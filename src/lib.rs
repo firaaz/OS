@@ -1,3 +1,5 @@
+/* functions that are used as helper functions */
+
 #![no_std]
 
 #![cfg_attr(test, no_main)]
@@ -12,8 +14,10 @@ use x86_64::structures::idt::InterruptDescriptorTable;
 pub mod interrupts;
 pub mod serial;
 pub mod vga_buffer;
+pub mod gdt;
 
 pub fn init() {
+    gdt::init();
     interrupts::init_idt();
 }
 

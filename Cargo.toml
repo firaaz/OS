@@ -26,3 +26,7 @@ test-timeout = 300
 [[test]]
 name = "should_panic"
 harness = false 							# so that the test_runner does not run it
+
+[[test]]
+name = "stack_overflow"
+harness = false

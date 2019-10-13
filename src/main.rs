@@ -1,5 +1,8 @@
+/* Main control flow of the program */
+
 #![feature(custom_test_frameworks)]
 #![test_runner(os::test_runner)]
+#![allow(unconditional_recursion)]
 
 #![no_std]                  // Rust standard library is not linked
 #![no_main]                 // disable the main() entry point
@@ -34,10 +37,13 @@ pub extern "C" fn _start() {
 
     os::init();
 
-    unsafe {
-        *(0xdeadbeef as *mut u64) = 42;
-    };
     x86_64::instructions::interrupts::int3();
+
+    // fn stack_overflow() {
+        // stack_overflow();
+    // }
+//
+    // stack_overflow();
 
     #[cfg(test)]
     test_main();

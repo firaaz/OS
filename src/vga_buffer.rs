@@ -1,3 +1,5 @@
+/* Functions to display to the VGA buffer*/
+
 use volatile::Volatile;
 use core::fmt;
 use lazy_static::lazy_static;
