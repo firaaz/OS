@@ -19,7 +19,7 @@ mod serial;
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop{}
+    os::hlt_loop();
 }
 
 // Function called on panic
@@ -37,7 +37,7 @@ pub extern "C" fn _start() {
 
     os::init();
 
-    x86_64::instructions::interrupts::int3();
+    // x86_64::instructions::interrupts::int3();
 
     // fn stack_overflow() {
         // stack_overflow();
@@ -49,5 +49,5 @@ pub extern "C" fn _start() {
     test_main();
 
     println!("no crashes!!!!");
-    loop {}
+    os::hlt_loop();
 }
