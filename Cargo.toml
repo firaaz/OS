@@ -13,6 +13,7 @@ spin = "0.5.2"
 x86_64 = "0.7.5"
 uart_16550 = "0.2.0" 						# as this a safe UART for x86 and supports most
 pic8259_simple = "0.1.1" 					# for pic abstractions( using 8259 cause easier to implement )
+pc-keyboard = "0.3.1"						# for getting the key values from the scancodes
 
 [dependencies.lazy_static]
 version = "1.0"
