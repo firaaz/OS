@@ -10,6 +10,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
+use bootloader::{BootInfo, entry_point};
 // use os::println;
 
 mod vga_buffer;
@@ -29,25 +30,22 @@ fn panic(info: &PanicInfo) -> ! {
     os::test_panic_handler(info);
 }
 
-// disable the mangling of the name so that is can be called by the linker as
-// the linker looks for a _start by default
-#[no_mangle]
-pub extern "C" fn _start() {
+entry_point!(kernel_main);
+
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
+    use x86_64::registers::control::Cr3;
+
     println!("Hello World!");
 
     os::init();
 
-    // x86_64::instructions::interrupts::int3();
+    let (level_4_page_table, _) = Cr3::read();
+    println!("Level 4 page table at: {:?}", level_4_page_table.start_address());
 
-    // fn stack_overflow() {
-        // stack_overflow();
-    // }
-//
-    // stack_overflow();
 
     #[cfg(test)]
     test_main();
 
     println!("no crashes!!!!");
-    os::hlt_loop();
+    os::hlt_loop()
 }
