@@ -1,7 +1,8 @@
 use x86_64::{structures::paging::PageTable, VirtAddr, PhysAddr};
+use x86_64::structures::paging::OffsetPageTable;
 
 // Returns a mutable refrence to the level 4 table
-pub unsafe fn active_level_4_table(physical_memory_offset: VirtAddr) 
+unsafe fn active_level_4_table(physical_memory_offset: VirtAddr) 
     -> &'static mut PageTable {
     use x86_64::registers::control::Cr3;
 
@@ -12,6 +13,11 @@ pub unsafe fn active_level_4_table(physical_memory_offset: VirtAddr)
     let page_table_ptr: *mut PageTable = virt.as_mut_ptr();
 
     &mut *page_table_ptr // this is unsafe
+}
+
+pub unsafe fn init(physical_memory_offset: VirtAddr) -> OffsetPageTable<'static> {
+    let level_4_table = active_level_4_table(physical_memory_offset);
+    OffsetPageTable::new(level_4_table, physical_memory_offset)
 }
 
 // translates virtual to physical address
