@@ -12,8 +12,8 @@
 - [-] basic interrupt (breakpoint)
 - [-] triple and double fault control
 	- [-] Kernel stack overflow - use IST for taking care of this
-- [TODO] Hardware interrupts
+- [-] Hardware interrupts
 
-[TODO] memory management
-- [TODO] Paging
-- [TODO] Heap allocation
+[-] memory management
+- [-] Paging
+- [-] Heap allocation

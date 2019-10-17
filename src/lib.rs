@@ -2,21 +2,26 @@
 
 #![no_std]
 
+#![feature(alloc_error_handler)]
 #![cfg_attr(test, no_main)]
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
 
+extern crate alloc;
+
 use core::panic::PanicInfo;
 use x86_64::structures::idt::InterruptDescriptorTable;
 use bootloader::{entry_point, BootInfo};
+use linked_list_allocator::LockedHeap;
 
 pub mod interrupts;
 pub mod serial;
 pub mod vga_buffer;
 pub mod gdt;
 pub mod memory;
+pub mod allocator;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
@@ -63,6 +68,14 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     exit_qemu(QemuExitCode::Failed);
     hlt_loop();
 }
+
+#[alloc_error_handler]
+fn alloc_error_handler(layout: alloc::alloc::Layout) -> ! {
+    panic!("allocation error: {:?}", layout)
+}
+
+#[global_allocator]
+static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 #[cfg(test)]
 #[panic_handler]

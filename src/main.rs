@@ -9,6 +9,9 @@
 
 #![reexport_test_harness_main = "test_main"]
 
+extern crate alloc;
+
+use alloc::{boxed::Box, vec, vec::Vec, rc::Rc};
 use core::panic::PanicInfo;
 use bootloader::{BootInfo, entry_point};
 // use os::println;
@@ -33,8 +36,7 @@ fn panic(info: &PanicInfo) -> ! {
 entry_point!(kernel_main);
 
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
-    // use os::memory::active_level_4_table;
-    // use os::memory::translate_addr;
+    use os::allocator;
     use os::memory;
     use x86_64::VirtAddr;
     use x86_64::structures::paging::PageTable;
@@ -46,49 +48,6 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     os::init();
 
-    // let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
-    // let l4_table = unsafe {
-        // active_level_4_table(phys_mem_offset)
-    // };
-//
-    // for (i, entry) in l4_table.iter().enumerate() {
-        // if !entry.is_unused() {
-            // // println!("L4 Entry {}: {:?}", i, entry);
-//
-            // // to get the actual physical address
-            // let phys = entry.frame().unwrap().start_address();
-            // let virt = phys.as_u64() + boot_info.physical_memory_offset;
-            // let ptr = VirtAddr::new(virt).as_mut_ptr();
-            // let l3_table: &PageTable = unsafe {&*ptr};
-//
-            // for (i, entry) in l3_table.iter().enumerate() {
-                // if !entry.is_unused() {
-                    // println!("L3 Entry {}: {:?}", i, entry);
-                    // let phys = entry.frame().unwrap().start_address();
-                    // let virt = phys.as_u64() + boot_info.physical_memory_offset;
-                    // let ptr = VirtAddr::new(virt).as_mut_ptr();
-                    // let l3_table: &PageTable = unsafe {&*ptr};
-//
-                    // for (i, entry) in l3_table.iter().enumerate() {
-                        // if !entry.is_unused() {
-                            // println!("L2 Entry {}: {:?}", i, entry);
-                            // let phys = entry.frame().unwrap().start_address();
-                            // let virt = phys.as_u64() + boot_info.physical_memory_offset;
-                            // let ptr = VirtAddr::new(virt).as_mut_ptr();
-                            // let l3_table: &PageTable = unsafe {&*ptr};
-//
-                            // for (i, entry) in l3_table.iter().enumerate() {
-                                // if !entry.is_unused() {
-                                    // println!("L1 Entry {}: {:?}", i, entry);
-                                // }
-                            // }
-                        // }
-                    // }
-                // }
-            // }
-        // }
-    // }
-
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
     let mut mapper = unsafe {
         memory::init(phys_mem_offset)
@@ -97,27 +56,24 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
         BootInfoFrameAllocator::init(&boot_info.memory_map)
     };
 
-    // page at 0 is for sure empty
-    let page = Page::containing_address(VirtAddr::new(0));
-    memory::create_example_mapping(page, &mut mapper, &mut frame_allocator);
+    allocator::init_heap(&mut mapper, &mut frame_allocator)
+        .expect("heap initialization failed");
 
-    let page_ptr: *mut u64 = page.start_address().as_mut_ptr();
-    unsafe {
-        page_ptr.offset(400).write_volatile(0x_f021_f077_f065_f04e)
-    };
+    let heap_value = Box::new(41);
+    println!("heap value at {:p}", heap_value);
 
-    // let addresses = [
-        // 0xb8000,                  // vga buffer
-        // 0x201008,                 // random code page
-        // 0x0100_0020_1a10,         // stack page
-        // boot_info.physical_memory_offset,
-    // ];
-//
-    // for &address in &addresses {
-        // let virt = VirtAddr::new(address);
-        // let phys = mapper.translate_addr(virt);
-        // println!("{:?} -> {:?}", virt, phys)
-    // }
+    let mut vec = Vec::new();
+    for i in 0..500 {
+        vec.push(i);
+    }
+    println!("vec at {:p}", vec.as_slice());
+
+
+    let refrence_counted = Rc::new(vec![1,2,3]);
+    let cloned_reference = refrence_counted.clone();
+    println!("current refrence count is {}", Rc::strong_count(&cloned_reference));
+    core::mem::drop(refrence_counted);
+    println!("refrence count is {}", Rc::strong_count(&cloned_reference));
 
     #[cfg(test)]
     test_main();
