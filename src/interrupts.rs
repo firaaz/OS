@@ -1,6 +1,7 @@
 /* CPU Interrupts */
 
-use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
+use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame,
+                              PageFaultErrorCode};
 use lazy_static::lazy_static;
 use pic8259_simple::ChainedPics; //for the primary and secondary PIC layout
 use spin;
@@ -134,5 +135,3 @@ fn test_breakpoint_exception() {
     x86_64::instructions::interrupts::int3();
     serial_println!("[ok]");
 }
-
-

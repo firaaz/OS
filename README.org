@@ -1,0 +1,31 @@
+#+TITLE:   RUST OS
+#+DATE:    October 29, 2019
+#+STARTUP: inlineimages
+
+* Table of Contents :TOC_3:noexport:
+- [[#description][Description]]
+- [[#prerequisites][Prerequisites]]
+- [[#usage][Usage]]
+
+* Description
+A minimal microkernel.
+
+At this point in time it supports:
++ printing to VGA Buffer
++ Interrupt management
++ Serial port IO
++ memory allocation
+
+* Prerequisites
+install bootimage through
+- cargo bootimage
+
+* Usage
+- to run the kernel in a qemu virtualized environment
+  - cargo xrun
+- to build the kernel
+  - cargo xbuild
+- to run test cases
+  - cargo xtest
+    it is possible to run specific tests only by
+    cargo xtest --test memory_overflow (example)
